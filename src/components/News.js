@@ -7,17 +7,49 @@ export class News extends Component {
     this.state = {
       articles: [],
       loading: false,
+      page: 1,
     };
   }
 
   async componentDidMount() {
     let url =
-      "https://newsapi.org/v2/top-headlines?country=id&apiKey=dd72b400715b4ec1bf5947e5b05ceb3d";
+      "https://newsapi.org/v2/top-headlines?country=id&apiKey=dd72b400715b4ec1bf5947e5b05ceb3d&page=1&pagesize=20";
     let data = await fetch(url);
     let parsedData = await data.json();
     console.log(parsedData);
-    this.setState({ articles: parsedData.articles });
+    this.setState({
+      articles: parsedData.articles,
+      totalResults: parsedData.totalResults,
+    });
   }
+  handlePrevClick = async () => {
+    let url = `https://newsapi.org/v2/top-headlines?country=id&apiKey=dd72b400715b4ec1bf5947e5b05ceb3d&page=${
+      this.state.page - 1
+    }&pagesize=20`;
+    let data = await fetch(url);
+    let parsedData = await data.json();
+    this.setState({
+      page: this.state.page - 1,
+      articles: parsedData.articles,
+    });
+  };
+  handleNextClick = async () => {
+    //math.ceil gives the ceiling value i.e. if 2.8 it gives 3
+    //here if the no of the next page is greater than the result of math.ceil of the total number of results divided by the pagesize i.e. 20 then we donot render anything but if the next page number is less than tha value i.e. if totalResults in the json , if it is for eg 38 then the math.ceil returns 2 thus it doesnot show page 3 cuz 3>2 and math.ceil returns 2 when we divide  38/2 .
+    if (this.state.page + 1 > Math.ceil(this.state.totalResults / 20)) {
+    } else {
+      let url = `https://newsapi.org/v2/top-headlines?country=id&apiKey=dd72b400715b4ec1bf5947e5b05ceb3d&page=${
+        this.state.page + 1
+      }&pagesize=20`;
+      let data = await fetch(url);
+      let parsedData = await data.json();
+      this.setState({
+        page: this.state.page + 1,
+        articles: parsedData.articles,
+      });
+    }
+  };
+
   render() {
     return (
       <div className="container my-3">
@@ -27,14 +59,39 @@ export class News extends Component {
             return (
               <div className="col-md-4" key={element.url}>
                 <NewsItem
-                  title={element.title ? element.title : ""}
-                  description={element.description ? element.description : ""}
+                  title={element.title ? element.title : "who are you"}
+                  description={
+                    element.description
+                      ? element.description
+                      : "loremfjlkdsjflsdjfkljsdlkfjdslkfjlks"
+                  }
                   imageUrl={element.urlToImage}
                   newsUrl={element.url}
                 />
               </div>
             );
           })}
+        </div>
+        <div className="container d-flex justify-content-between">
+          <button
+            //this button will be disabled if the page no is less than or equal to 1 we can find this feature of page in the documentation of the news api
+            disabled={this.state.page <= 1}
+            type="button"
+            className="btn btn-dark"
+            onClick={this.handlePrevClick}
+          >
+            &larr; Previous
+          </button>
+          <button
+            disabled={
+              this.state.page + 1 > Math.ceil(this.state.totalResults / 20)
+            }
+            type="button"
+            className="btn btn-dark"
+            onClick={this.handleNextClick}
+          >
+            Next &rarr;
+          </button>
         </div>
       </div>
     );
