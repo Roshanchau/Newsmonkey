@@ -1,8 +1,19 @@
 import React, { Component } from "react";
 import NewsItem from "./NewsItem";
 import Spinner from "./Spinner";
+import PropTypes from "prop-types";
 
 export class News extends Component {
+  static defautProps = {
+    country: "us",
+    pageSize: 8,
+    category: "general",
+  };
+  static propTypes = {
+    country: PropTypes.string,
+    pageSize: PropTypes.number,
+    category: PropTypes.string,
+  };
   constructor() {
     super();
     this.state = {
@@ -13,7 +24,7 @@ export class News extends Component {
   }
 
   async componentDidMount() {
-    let url = `https://newsapi.org/v2/top-headlines?country=us&apiKey=dd72b400715b4ec1bf5947e5b05ceb3d&page=1&pageSize=${this.props.pageSize}`;
+    let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=dd72b400715b4ec1bf5947e5b05ceb3d&page=1&pageSize=${this.props.pageSize}`;
     // we have set the state of the loading to true so that the spinner can be shown until the json data from the api is fetched and parsed.
     this.setState({ loading: true });
 
@@ -28,7 +39,11 @@ export class News extends Component {
     });
   }
   handlePrevClick = async () => {
-    let url = `https://newsapi.org/v2/top-headlines?country=us&apiKey=dd72b400715b4ec1bf5947e5b05ceb3d&page=${
+    let url = `https://newsapi.org/v2/top-headlines?country=${
+      this.props.country
+    }&category=${
+      this.props.category
+    }&apiKey=dd72b400715b4ec1bf5947e5b05ceb3d&page=${
       this.state.page - 1
     }&pageSize=${this.props.pageSize}`;
     this.setState({ loading: true });
@@ -44,7 +59,11 @@ export class News extends Component {
     //math.ceil gives the ceiling value i.e. if 2.8 it gives 3
     //here if the no of the next page is greater than the result of math.ceil of the total number of results divided by the pagesize i.e. 20 then we donot render anything but if the next page number is less than tha value i.e. if totalResults in the json , if it is for eg 38 then the math.ceil returns 2 thus it doesnot show page 3 cuz 3>2 and math.ceil returns 2 when we divide  38/2 .
     if (!(this.state.page + 1 > Math.ceil(this.state.totalResults / 20))) {
-      let url = `https://newsapi.org/v2/top-headlines?country=us&apiKey=dd72b400715b4ec1bf5947e5b05ceb3d&page=${
+      let url = `https://newsapi.org/v2/top-headlines?country=${
+        this.props.country
+      }&category=${
+        this.props.category
+      }&apiKey=dd72b400715b4ec1bf5947e5b05ceb3d&page=${
         this.state.page + 1
       }&pageSize=${this.props.pageSize}`;
       this.setState({ loading: true });
@@ -61,7 +80,9 @@ export class News extends Component {
   render() {
     return (
       <div className="container my-3">
-        <h1 className="text-center">NewsMonkey- Top Headlines</h1>
+        <h1 className="text-center" style={{ margin: "35px 0" }}>
+          NewsMonkey- Top Headlines
+        </h1>
         {/* we show spinner if and only if the loading is true. */}
         {this.state.loading && <Spinner />}
         <div className="row my-3 ">
