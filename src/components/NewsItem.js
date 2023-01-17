@@ -10,7 +10,7 @@ export class NewsItem extends Component {
       <div>
         <div className="card my-3">
           <span
-            class="position-absolute top-0  translate-middle badge rounded-pill bg-danger"
+            className="position-absolute top-0  translate-middle badge rounded-pill bg-danger"
             style={{ left: "90%", zIndex: "1" }}
           >
             {source}
@@ -27,8 +27,8 @@ export class NewsItem extends Component {
           <div className="card-body">
             <h5 className="card-title">{title}</h5>
             <p className="card-text">{description}</p>
-            <p class="card-text">
-              <small class="text-muted">
+            <p className="card-text">
+              <small className="text-danger">
                 By {!author ? "unknown" : author} on{" "}
                 {new Date(date).toGMTString()}
               </small>

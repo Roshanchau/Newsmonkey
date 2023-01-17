@@ -23,58 +23,80 @@ export class News extends Component {
     };
   }
 
-  async componentDidMount() {
-    let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=dd72b400715b4ec1bf5947e5b05ceb3d&page=1&pageSize=${this.props.pageSize}`;
-    // we have set the state of the loading to true so that the spinner can be shown until the json data from the api is fetched and parsed.
+  async updateNews() {
+    let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=dd72b400715b4ec1bf5947e5b05ceb3d&page=${this.state.page}&pageSize=${this.props.pageSize}`;
     this.setState({ loading: true });
-
     let data = await fetch(url);
     let parsedData = await data.json();
     console.log(parsedData);
     this.setState({
       articles: parsedData.articles,
       totalResults: parsedData.totalResults,
-      // now we have set the loading state to false since the data from the api is fetched and parsed.
       loading: false,
     });
   }
+
+  async componentDidMount() {
+    // let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=dd72b400715b4ec1bf5947e5b05ceb3d&page=1&pageSize=${this.props.pageSize}`;
+    // // we have set the state of the loading to true so that the spinner can be shown until the json data from the api is fetched and parsed.
+    // this.setState({ loading: true });
+
+    // let data = await fetch(url);
+    // let parsedData = await data.json();
+    // console.log(parsedData);
+    // this.setState({
+    //   articles: parsedData.articles,
+    //   totalResults: parsedData.totalResults,
+    //   // now we have set the loading state to false since the data from the api is fetched and parsed.
+    //   loading: false,
+    // });
+    this.updateNews();
+  }
   handlePrevClick = async () => {
-    let url = `https://newsapi.org/v2/top-headlines?country=${
-      this.props.country
-    }&category=${
-      this.props.category
-    }&apiKey=dd72b400715b4ec1bf5947e5b05ceb3d&page=${
-      this.state.page - 1
-    }&pageSize=${this.props.pageSize}`;
-    this.setState({ loading: true });
-    let data = await fetch(url);
-    let parsedData = await data.json();
+    // let url = `https://newsapi.org/v2/top-headlines?country=${
+    //   this.props.country
+    // }&category=${
+    //   this.props.category
+    // }&apiKey=dd72b400715b4ec1bf5947e5b05ceb3d&page=${
+    //   this.state.page - 1
+    // }&pageSize=${this.props.pageSize}`;
+    // this.setState({ loading: true });
+    // let data = await fetch(url);
+    // let parsedData = await data.json();
+    // this.setState({
+    //   page: this.state.page - 1,
+    //   articles: parsedData.articles,
+    //   loading: false,
+    // })
     this.setState({
       page: this.state.page - 1,
-      articles: parsedData.articles,
-      loading: false,
     });
+    this.updateNews();
   };
   handleNextClick = async () => {
     //math.ceil gives the ceiling value i.e. if 2.8 it gives 3
     //here if the no of the next page is greater than the result of math.ceil of the total number of results divided by the pagesize i.e. 20 then we donot render anything but if the next page number is less than tha value i.e. if totalResults in the json , if it is for eg 38 then the math.ceil returns 2 thus it doesnot show page 3 cuz 3>2 and math.ceil returns 2 when we divide  38/2 .
-    if (!(this.state.page + 1 > Math.ceil(this.state.totalResults / 20))) {
-      let url = `https://newsapi.org/v2/top-headlines?country=${
-        this.props.country
-      }&category=${
-        this.props.category
-      }&apiKey=dd72b400715b4ec1bf5947e5b05ceb3d&page=${
-        this.state.page + 1
-      }&pageSize=${this.props.pageSize}`;
-      this.setState({ loading: true });
-      let data = await fetch(url);
-      let parsedData = await data.json();
-      this.setState({
-        page: this.state.page + 1,
-        articles: parsedData.articles,
-        loading: false,
-      });
-    }
+    // if (!(this.state.page + 1 > Math.ceil(this.state.totalResults / 20))) {
+    //   let url = `https://newsapi.org/v2/top-headlines?country=${
+    //     this.props.country
+    //   }&category=${
+    //     this.props.category
+    //   }&apiKey=dd72b400715b4ec1bf5947e5b05ceb3d&page=${
+    //     this.state.page + 1
+    //   }&pageSize=${this.props.pageSize}`;
+    //   this.setState({ loading: true });
+    //   let data = await fetch(url);
+    //   let parsedData = await data.json();
+    //   this.setState({
+    //     page: this.state.page + 1,
+    //     articles: parsedData.articles,
+    //     loading: false,
+    //   });
+    // }
+    this.setState({
+      page: this.state.page + 1,
+    });
+    this.updateNews();
   };
 
   render() {
