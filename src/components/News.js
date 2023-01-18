@@ -2,8 +2,12 @@ import React, { Component } from "react";
 import NewsItem from "./NewsItem";
 import Spinner from "./Spinner";
 import PropTypes from "prop-types";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 export class News extends Component {
+  capitalizeFirstLetter = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
   static defautProps = {
     country: "us",
     pageSize: 8,
@@ -14,16 +18,21 @@ export class News extends Component {
     pageSize: PropTypes.number,
     category: PropTypes.string,
   };
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       articles: [],
-      loading: false,
+      loading: true,
       page: 1,
+      totalResults: 0,
     };
+    document.title = `${this.capitalizeFirstLetter(
+      this.props.category
+    )}-NewsMonkey`;
   }
 
   async updateNews() {
+    //we have used this url to fetch different kind of news like through country , category, and etc.
     let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=dd72b400715b4ec1bf5947e5b05ceb3d&page=${this.state.page}&pageSize=${this.props.pageSize}`;
     this.setState({ loading: true });
     let data = await fetch(url);
@@ -99,38 +108,63 @@ export class News extends Component {
     this.updateNews();
   };
 
+  fetchMoreData = async () => {
+    this.setState({ page: this.state.page + 1 });
+    let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=dd72b400715b4ec1bf5947e5b05ceb3d&page=${this.state.page}&pageSize=${this.props.pageSize}`;
+    let data = await fetch(url);
+    let parsedData = await data.json();
+    console.log(parsedData);
+    this.setState({
+      articles: this.state.articles.concat(parsedData.articles),
+      totalResults: parsedData.totalResults,
+    });
+  };
+
   render() {
     return (
-      <div className="container my-3">
+      <>
         <h1 className="text-center" style={{ margin: "35px 0" }}>
-          NewsMonkey- Top Headlines
+          {`NewsMonkey- Top Headlines from ${this.capitalizeFirstLetter(
+            this.props.category
+          )} `}
         </h1>
         {/* we show spinner if and only if the loading is true. */}
-        {this.state.loading && <Spinner />}
-        <div className="row my-3 ">
-          {/* we map the articles only when the loading state is false i.e when the loading state is true we have to only show the spinner nothing else to render but as soon as the loading state hits to false it have to map through each article and render it. */}
-          {!this.state.loading &&
-            this.state.articles.map((element) => {
-              return (
-                <div className="col-md-4" key={element.url}>
-                  <NewsItem
-                    title={element.title ? element.title : "who are you"}
-                    description={
-                      element.description
-                        ? element.description
-                        : "loremfjlkdsjflsdjfkljsdlkfjdslkfjlks"
-                    }
-                    imageUrl={element.urlToImage}
-                    newsUrl={element.url}
-                    author={element.author}
-                    date={element.publishedAt}
-                    source={element.source.name}
-                  />
-                </div>
-              );
-            })}
-        </div>
-        <div className="container d-flex justify-content-between">
+        {/* {this.state.loading && <Spinner />} */}
+        <InfiniteScroll
+          dataLength={this.state.articles.length}
+          next={this.fetchMoreData}
+          hasMore={this.state.articles.length !== this.totalResults}
+          loader={<Spinner />}
+        >
+          <div className="container">
+            <div className="row my-3 ">
+              {/* we map the articles only when the loading state is false i.e when the loading state is true we have to only show the spinner nothing else to render but as soon as the loading state hits to false it have to map through each article and render it. */}
+              {
+                /*!this.state.loading &&*/
+                this.state.articles.map((element) => {
+                  return (
+                    <div className="col-md-4" key={element.url}>
+                      <NewsItem
+                        title={element.title ? element.title : "who are you"}
+                        description={
+                          element.description
+                            ? element.description
+                            : "loremfjlkdsjflsdjfkljsdlkfjdslkfjlks"
+                        }
+                        imageUrl={element.urlToImage}
+                        newsUrl={element.url}
+                        author={element.author}
+                        date={element.publishedAt}
+                        source={element.source.name}
+                      />
+                    </div>
+                  );
+                })
+              }
+            </div>
+          </div>
+        </InfiniteScroll>
+        {/* <div className="container d-flex justify-content-between">
           <button
             //this button will be disabled if the page no is less than or equal to 1 we can find this feature of page in the documentation of the news api
             disabled={this.state.page <= 1}
@@ -151,8 +185,8 @@ export class News extends Component {
           >
             Next &rarr;
           </button>
-        </div>
-      </div>
+        </div> */}
+      </>
     );
   }
 }
