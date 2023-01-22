@@ -35,7 +35,7 @@ export class News extends Component {
     this.props.setProgress(10);
     console.log(this.props.setProgress);
     //we have used this url to fetch different kind of news like through country , category, and etc.
-    let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=f7ef9ecf57b1472884e30ae7725a7d35&page=${this.state.page}&pageSize=${this.props.pageSize}`;
+    let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=${this.props.apiKey}&page=${this.state.page}&pageSize=${this.props.pageSize}`;
     this.setState({ loading: true });
     let data = await fetch(url);
     this.props.setProgress(30);
@@ -115,7 +115,7 @@ export class News extends Component {
 
   fetchMoreData = async () => {
     this.setState({ page: this.state.page + 1 });
-    let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=f7ef9ecf57b1472884e30ae7725a7d35&page=${this.state.page}&pageSize=${this.props.pageSize}`;
+    let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=${this.props.apiKey}&page=${this.state.page}&pageSize=${this.props.pageSize}`;
     let data = await fetch(url);
     let parsedData = await data.json();
     console.log(parsedData);
